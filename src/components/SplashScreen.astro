@@ -1,0 +1,144 @@
+---
+const ENTER_DURATION = 1200; // splash fade-in
+const SHINE_DURATION = 2000; // teks shine berjalan sebelum fade-out
+const FADE_OUT_DURATION = 1200; // durasi transition opacity saat fade-out
+---
+
+<div
+  id="vespa-splash"
+  class="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-[#fafaf8] text-[#1a1a1a] opacity-0 transition-opacity ease-in-out dark:bg-[#0a0a0a] dark:text-white"
+  aria-hidden="true"
+>
+  <div class="relative text-[clamp(2.4rem,8vw,5rem)] font-bold tracking-[0.04em]">
+    <span id="vespa-splash-static" class="opacity-30 transition-opacity duration-500 ease-in-out">Vespa DPM Cibubur</span>
+    <span id="vespa-splash-shine" class="vespa-shine-text absolute inset-0 opacity-0">Vespa DPM Cibubur</span>
+  </div>
+  <div class="mt-2 text-[clamp(0.8rem,2vw,1.2rem)] font-normal tracking-[0.2em] opacity-50">
+    — premium scooter —
+  </div>
+</div>
+
+<style>
+  /* Efek "shine sweep": gradient bergerak di atas teks lewat background-clip. */
+  .vespa-shine-text {
+    background-image: linear-gradient(
+      100deg,
+      currentColor 30%,
+      #4f46e5 45%,
+      #4f46e5 55%,
+      currentColor 70%
+    );
+    background-size: 250% 100%;
+    background-position: 100% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: currentColor;
+    -webkit-text-fill-color: transparent;
+    transition: opacity 0.4s ease;
+  }
+
+  :global(.dark) .vespa-shine-text {
+    background-image: linear-gradient(
+      100deg,
+      currentColor 30%,
+      #facc15 45%,
+      #facc15 55%,
+      currentColor 70%
+    );
+  }
+
+  .vespa-shine-text.is-animating {
+    animation: vespa-shine-sweep 2s linear infinite;
+  }
+
+  @keyframes vespa-shine-sweep {
+    to {
+      background-position: -150% 0;
+    }
+  }
+</style>
+
+<script define:vars={{ ENTER_DURATION, SHINE_DURATION, FADE_OUT_DURATION }}>
+  (function () {
+    const root = document.getElementById('vespa-splash');
+    const staticText = document.getElementById('vespa-splash-static');
+    const shineText = document.getElementById('vespa-splash-shine');
+    if (!root || !staticText || !shineText) return;
+
+    const SESSION_KEY = 'vespa-splash-shown';
+
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      root.style.visibility = 'hidden';
+      root.style.pointerEvents = 'none';
+      window.__vespaSplashComplete = true;
+      window.dispatchEvent(new CustomEvent('vespa-splash-complete'));
+    };
+
+    try {
+      if (sessionStorage.getItem(SESSION_KEY)) {
+        finish();
+        return;
+      }
+      sessionStorage.setItem(SESSION_KEY, '1');
+    } catch (e) {
+    }
+
+    let started = false;
+    const beginSplash = () => {
+      if (started) return;
+      started = true;
+      root.style.transitionDuration = `${ENTER_DURATION}ms`;
+      requestAnimationFrame(() => {
+        root.classList.remove('opacity-0');
+        root.classList.add('opacity-100');
+      });
+
+      const shineTimer = setTimeout(() => {
+        staticText.classList.add('opacity-0');
+        shineText.classList.remove('opacity-0');
+        shineText.classList.add('opacity-100', 'is-animating');
+      }, ENTER_DURATION);
+
+      const exitTimer = setTimeout(() => {
+        root.style.transitionDuration = `${FADE_OUT_DURATION}ms`;
+        root.classList.remove('opacity-100');
+        root.classList.add('opacity-0');
+      }, ENTER_DURATION + SHINE_DURATION);
+
+      const handleTransitionEnd = (e) => {
+        if (e.target === root && e.propertyName === 'opacity' && root.classList.contains('opacity-0')) {
+          finish();
+        }
+      };
+      root.addEventListener('transitionend', handleTransitionEnd);
+
+      // Fallback kalau transitionend tidak fire (mis. tab di-background).
+      const fallbackTimer = setTimeout(
+        finish,
+        ENTER_DURATION + SHINE_DURATION + FADE_OUT_DURATION + 300
+      );
+
+      window.addEventListener(
+        'pagehide',
+        () => {
+          clearTimeout(shineTimer);
+          clearTimeout(exitTimer);
+          clearTimeout(fallbackTimer);
+          root.removeEventListener('transitionend', handleTransitionEnd);
+        },
+        { once: true }
+      );
+    };
+
+    if (window.__vespaPageLoaded) {
+      beginSplash();
+    } else {
+      window.addEventListener('vespa-page-loaded', beginSplash, { once: true });
+      // fallback kalau event 'vespa-page-loaded' tidak pernah terpicu.
+      setTimeout(beginSplash, 4300);
+    }
+  })();
+</script>

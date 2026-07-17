@@ -1,0 +1,221 @@
+---
+import '@/styles/globals.css';
+import { Spinner } from '@/components/ui/spinner';
+
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  noindex?: boolean;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title,
+  description = 'Vespa DPM Cibubur — dealer resmi Vespa Matic premium di Cibubur.',
+  image = '/og.png',
+  noindex = false,
+  structuredData,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(image, Astro.site);
+
+const dealerName = import.meta.env.PUBLIC_DEALER_NAME;
+const instagramUrl = import.meta.env.PUBLIC_INSTAGRAM_URL;
+const tiktokUrl = import.meta.env.PUBLIC_TIKTOK_URL;
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'AutomotiveBusiness',
+  name: dealerName,
+  description,
+  image: ogImageURL.toString(),
+  url: Astro.site?.toString(),
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Cibubur',
+    addressRegion: 'Jawa Barat',
+    addressCountry: 'ID',
+  },
+  priceRange: 'Rp 46.000.000 - Rp 97.000.000',
+};
+
+const schemaList = Array.isArray(structuredData)
+  ? structuredData
+  : structuredData
+    ? [structuredData]
+    : [];
+---
+
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <script is:inline>
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+    </script>
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          var theme =
+            stored === 'dark' || stored === 'light'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+          document.documentElement.classList.toggle('dark', theme === 'dark');
+        } catch (e) {}
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
+    <link rel="canonical" href={canonicalURL} />
+    <title>{title}</title>
+
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="VespaDPM" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#fafaf8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={dealerName} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:locale" content="id_ID" />
+
+    <!-- Twitter/X -->
+     <meta name="twitter:card" content="summary_large_image" />
+     <meta name="twitter:title" content={title} />
+     <meta name="twitter:description" content={description} />
+     <meta name="twitter:image" content={ogImageURL} />
+
+    {instagramUrl && <link rel="me" href={instagramUrl} title={`Instagram ${dealerName}`} />}
+    {tiktokUrl && <link rel="me" href={tiktokUrl} title={`TikTok ${dealerName}`} />}
+
+    <!-- JSON-LD: schema bisnis (semua halaman) + schema tambahan per-halaman -->
+    <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+      {schemaList.map((schema) => (
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
+  </head>
+  <body class="font-sans antialiased bg-background text-foreground">
+    <div
+      id="page-loader"
+      class="fixed inset-0 z-10000 flex items-center justify-center bg-[#fafaf8] transition-opacity duration-300 ease-out dark:bg-[#0a0a0a]"
+      aria-hidden="true"
+    >
+      <Spinner className="size-8 text-primary dark:text-yellow-400" />
+    </div>
+
+    <script is:inline>
+      (function () {
+        var loader = document.getElementById('page-loader');
+        if (!loader) return;
+
+        var SPLASH_KEY = 'vespa-splash-shown';
+        var isFirstVisit = true;
+        try {
+          isFirstVisit = !sessionStorage.getItem(SPLASH_KEY);
+        } catch (e) {
+          // sessionStorage tidak tersedia -> anggap kunjungan pertama, biarkan splash yang tampil.
+          isFirstVisit = true;
+        }
+
+        var hidden = false;
+        function hideLoader() {
+          if (hidden) return;
+          hidden = true;
+          window.__vespaPageLoaded = true;
+          window.dispatchEvent(new CustomEvent('vespa-page-loaded'));
+        }
+
+        if (isFirstVisit) {
+          loader.style.display = 'none';
+          hideLoader();
+          return;
+        }
+
+        function hideLoaderAnimated() {
+          if (hidden) return;
+          loader.style.opacity = '0';
+          loader.style.pointerEvents = 'none';
+          hideLoader();
+          setTimeout(function () {
+            loader.style.display = 'none';
+          }, 300);
+        }
+
+        if (document.readyState === 'complete') {
+          hideLoaderAnimated();
+        } else {
+          window.addEventListener('load', hideLoaderAnimated, { once: true });
+        }
+        // fallback -> jaga-jaga kalau event 'load' lambat (gambar berat, koneksi lelet, dll).
+        setTimeout(hideLoaderAnimated, 4000);
+      })();
+    </script>
+
+    <main id="swup">
+      <slot />
+    </main>
+
+    <div
+      id="page-transition-overlay"
+      class="pointer-events-none fixed inset-0 z-9998 flex items-center justify-center bg-background/70 opacity-0 backdrop-blur-sm transition-opacity duration-200"
+      aria-hidden="true"
+    >
+      <Spinner className="size-8 text-primary dark:text-yellow-400" />
+    </div>
+
+    <script>
+      import { gsap } from 'gsap';
+      import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      document.addEventListener('swup:enable', () => {
+        const swup = (window as any).swup;
+        if (!swup || (window as any).__vespaSwupHooksInit) return;
+        (window as any).__vespaSwupHooksInit = true;
+
+        const overlay = document.getElementById('page-transition-overlay');
+        const showOverlay = () => overlay?.classList.replace('opacity-0', 'opacity-100');
+        const hideOverlay = () => overlay?.classList.replace('opacity-100', 'opacity-0');
+
+        swup.hooks.on('visit:start', showOverlay);
+
+        // Fade + slight rise-out saat meninggalkan halaman lama.
+        swup.hooks.replace('animation:out:await', async () => {
+          await gsap.to('#swup', { opacity: 0, y: 16, duration: 0.35, ease: 'power2.in' });
+        });
+
+        // Fade + slight rise-in saat konten halaman baru masuk.
+        swup.hooks.replace('animation:in:await', async () => {
+          await gsap.fromTo(
+            '#swup',
+            { opacity: 0, y: -16 },
+            { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }
+          );
+        });
+
+        swup.hooks.on('content:replace', () => {
+          hideOverlay();
+          window.dispatchEvent(new CustomEvent('vespa-page-transition'));
+          requestAnimationFrame(() => ScrollTrigger.refresh());
+        });
+      });
+    </script>
+  </body>
+</html>

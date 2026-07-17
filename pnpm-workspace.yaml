@@ -1,0 +1,5 @@
+allowBuilds:
+  '@sentry/cli': true
+  '@sentry/node-cpu-profiler': true
+  esbuild: true
+  sharp: true
