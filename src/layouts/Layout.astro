@@ -1,6 +1,8 @@
 ---
 import '@/styles/globals.css';
 import { Spinner } from '@/components/ui/spinner';
+import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from "@vercel/speed-insights/astro"
 
 export interface Props {
   title: string;
@@ -217,5 +219,7 @@ const schemaList = Array.isArray(structuredData)
         });
       });
     </script>
+    <Analytics />
+    <SpeedInsights />
   </body>
 </html>
