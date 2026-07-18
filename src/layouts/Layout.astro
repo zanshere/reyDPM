@@ -53,6 +53,16 @@ const schemaList = Array.isArray(structuredData)
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8D27K25EHN"></script>
+  <script>
+    const win = window as any;
+    win.dataLayer = win.dataLayer || [];
+    function gtag(...args: unknown[]) { win.dataLayer.push(args); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-8D27K25EHN');
+  </script>
     <meta charset="UTF-8" />
     <script is:inline>
       if ('scrollRestoration' in history) {
@@ -78,6 +88,8 @@ const schemaList = Array.isArray(structuredData)
     <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
     <link rel="canonical" href={canonicalURL} />
     <title>{title}</title>
+
+    <meta name="google-site-verification" content="uNSVur4dSsCzWKT6cKUwaItzvnkQFbWcgh_3T2qHlLg" />
 
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
