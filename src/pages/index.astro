@@ -8,7 +8,6 @@ import Products from '@/components/sections/Products';
 import Contact from '@/components/sections/Contact';
 import FAQ from '@/components/sections/FAQ';
 import { faqs } from '@/components/sections/FAQ';
-import TesAstroComponent from '@/components/sections/tes.astro';
 
 const faqSchema = {
   '@context': 'https://schema.org',
@@ -39,7 +38,6 @@ const faqSchema = {
       <Products client:visible={{ rootMargin: '300px' }} />
       <Contact client:visible={{ rootMargin: '300px' }} />
       <FAQ client:visible={{ rootMargin: '300px' }} />
-      <TesAstroComponent />
       <Footer />
     </div>
   </div>
