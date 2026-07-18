@@ -11,7 +11,7 @@ import swup from '@swup/astro';
 
 // https://astro.build/config
 export default defineConfig({
-  site: import.meta.env.PUBLIC_SITE_URL || 'https://rey-vespa-dpm.vercel.app/',
+  site: import.meta.env.PUBLIC_SITE_URL || 'https://reyvespadpm.vercel.app/',
   integrations: [
     react(),
     swup({
