@@ -1,50 +1,38 @@
 ---
-const ENTER_DURATION = 1200; // splash fade-in
-const SHINE_DURATION = 2000; // teks shine berjalan sebelum fade-out
-const FADE_OUT_DURATION = 1200; // durasi transition opacity saat fade-out
+const ENTER_DURATION = 1200;
+const SHINE_DURATION = 2000;
+const FADE_OUT_DURATION = 1200;
 ---
 
 <div
   id="vespa-splash"
-  class="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-[#fafaf8] text-[#1a1a1a] opacity-0 transition-opacity ease-in-out dark:bg-[#0a0a0a] dark:text-white"
+  class="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-[#fafaf8] px-6 text-[#1a1a1a] opacity-0 transition-opacity ease-in-out dark:bg-[#0a0a0a] dark:text-white"
+  style="padding-left: max(1.5rem, env(safe-area-inset-left)); padding-right: max(1.5rem, env(safe-area-inset-right));"
   aria-hidden="true"
 >
-  <div class="relative text-[clamp(2.4rem,8vw,5rem)] font-bold tracking-[0.04em]">
+  <div class="relative inline-block max-w-[90vw] text-balance text-center text-[clamp(1.75rem,7.5vw,5rem)] font-bold leading-tight tracking-[0.02em] sm:tracking-[0.04em]">
     <span id="vespa-splash-static" class="opacity-30 transition-opacity duration-500 ease-in-out">Vespa DPM Cibubur</span>
     <span id="vespa-splash-shine" class="vespa-shine-text absolute inset-0 opacity-0">Vespa DPM Cibubur</span>
   </div>
-  <div class="mt-2 text-[clamp(0.8rem,2vw,1.2rem)] font-normal tracking-[0.2em] opacity-50">
+  <div class="mt-2 text-[clamp(0.75rem,2vw,1.2rem)] font-normal tracking-[0.2em] opacity-50">
     — premium scooter —
   </div>
 </div>
 
 <style>
-  /* Efek "shine sweep": gradient bergerak di atas teks lewat background-clip. */
   .vespa-shine-text {
-    background-image: linear-gradient(
-      100deg,
-      currentColor 30%,
-      #4f46e5 45%,
-      #4f46e5 55%,
-      currentColor 70%
-    );
+    background-image: linear-gradient(100deg, currentColor 30%, #4f46e5 45%, #4f46e5 55%, currentColor 70%);
     background-size: 250% 100%;
     background-position: 100% 0;
     -webkit-background-clip: text;
     background-clip: text;
     color: currentColor;
     -webkit-text-fill-color: transparent;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.4s ease-in-out;
   }
 
   :global(.dark) .vespa-shine-text {
-    background-image: linear-gradient(
-      100deg,
-      currentColor 30%,
-      #facc15 45%,
-      #facc15 55%,
-      currentColor 70%
-    );
+    background-image: linear-gradient(100deg, currentColor 30%, #facc15 45%, #facc15 55%, currentColor 70%);
   }
 
   .vespa-shine-text.is-animating {
@@ -52,9 +40,7 @@ const FADE_OUT_DURATION = 1200; // durasi transition opacity saat fade-out
   }
 
   @keyframes vespa-shine-sweep {
-    to {
-      background-position: -150% 0;
-    }
+    to { background-position: -150% 0; }
   }
 </style>
 
@@ -83,8 +69,7 @@ const FADE_OUT_DURATION = 1200; // durasi transition opacity saat fade-out
         return;
       }
       sessionStorage.setItem(SESSION_KEY, '1');
-    } catch (e) {
-    }
+    } catch (e) {}
 
     let started = false;
     const beginSplash = () => {
@@ -115,29 +100,20 @@ const FADE_OUT_DURATION = 1200; // durasi transition opacity saat fade-out
       };
       root.addEventListener('transitionend', handleTransitionEnd);
 
-      // Fallback kalau transitionend tidak fire (mis. tab di-background).
-      const fallbackTimer = setTimeout(
-        finish,
-        ENTER_DURATION + SHINE_DURATION + FADE_OUT_DURATION + 300
-      );
+      const fallbackTimer = setTimeout(finish, ENTER_DURATION + SHINE_DURATION + FADE_OUT_DURATION + 300);
 
-      window.addEventListener(
-        'pagehide',
-        () => {
-          clearTimeout(shineTimer);
-          clearTimeout(exitTimer);
-          clearTimeout(fallbackTimer);
-          root.removeEventListener('transitionend', handleTransitionEnd);
-        },
-        { once: true }
-      );
+      window.addEventListener('pagehide', () => {
+        clearTimeout(shineTimer);
+        clearTimeout(exitTimer);
+        clearTimeout(fallbackTimer);
+        root.removeEventListener('transitionend', handleTransitionEnd);
+      }, { once: true });
     };
 
     if (window.__vespaPageLoaded) {
       beginSplash();
     } else {
       window.addEventListener('vespa-page-loaded', beginSplash, { once: true });
-      // fallback kalau event 'vespa-page-loaded' tidak pernah terpicu.
       setTimeout(beginSplash, 4300);
     }
   })();

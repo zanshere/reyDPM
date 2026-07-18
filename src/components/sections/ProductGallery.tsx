@@ -1,19 +1,24 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, type PanInfo } from 'motion/react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import type Lenis from 'lenis';
 import { LazyImage } from '@/components/lazy/LazyLoad';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface ProductGalleryProps {
   images: string[];
   productName: string;
+  lenis?: Lenis | null;
 }
 
 const SWIPE_THRESHOLD = 60;
 
-const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productName }) => {
+const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productName, lenis }) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const isOpen = activeIndex !== null;
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const [loadedSrcs, setLoadedSrcs] = useState<Set<string>>(new Set());
   const markSrcLoaded = useCallback((src: string) => {
     setLoadedSrcs((prev) => (prev.has(src) ? prev : new Set(prev).add(src)));
@@ -32,23 +37,25 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productName }) 
   }, [images.length]);
 
   useEffect(() => {
-    if (!isOpen) return;
+      if (!isOpen) return;
 
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      lenis?.stop();
 
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
-      if (e.key === 'ArrowLeft') showPrev();
-      if (e.key === 'ArrowRight') showNext();
-    };
-    window.addEventListener('keydown', onKeyDown);
+      const onKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') close();
+        if (e.key === 'ArrowLeft') showPrev();
+        if (e.key === 'ArrowRight') showNext();
+      };
+      window.addEventListener('keydown', onKeyDown);
 
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      window.removeEventListener('keydown', onKeyDown);
-    };
-  }, [isOpen, close, showPrev, showNext]);
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        window.removeEventListener('keydown', onKeyDown);
+        lenis?.start();
+      };
+    }, [isOpen, close, showPrev, showNext, lenis]);
 
   const handleDragEnd = useCallback(
     (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
@@ -87,19 +94,21 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productName }) 
         ))}
       </div>
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-3 backdrop-blur-sm sm:p-6"
-            role="dialog"
-            aria-modal="true"
-            aria-label={`Galeri foto ${productName}`}
-            onClick={close}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-          >
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-3 backdrop-blur-sm sm:p-6"
+                role="dialog"
+                aria-modal="true"
+                aria-label={`Galeri foto ${productName}`}
+                onClick={close}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+              >
             <motion.div
               className="relative flex w-full max-w-4xl flex-col items-center"
               onClick={(e) => e.stopPropagation()}
@@ -187,7 +196,9 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productName }) 
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+      )}
     </>
   );
 };

@@ -15,10 +15,7 @@ const faqSchema = {
   mainEntity: faqs.map((faq) => ({
     '@type': 'Question',
     name: faq.q,
-    acceptedAnswer: {
-      '@type': 'Answer',
-      text: faq.a,
-    },
+    acceptedAnswer: { '@type': 'Answer', text: faq.a },
   })),
 };
 ---
@@ -30,8 +27,7 @@ const faqSchema = {
   structuredData={faqSchema}
 >
   <SplashScreen />
-
-  <div id="landing-page" class="opacity-0 transition-opacity duration-700 ease-out">
+  <div id="landing-page">
     <Navbar client:load />
     <Home client:load />
     <div id="below-fold">
@@ -41,19 +37,4 @@ const faqSchema = {
       <Footer />
     </div>
   </div>
-
-  <script is:inline>
-    (function () {
-      var el = document.getElementById('landing-page');
-      if (!el) return;
-
-      function reveal() {
-        el.style.opacity = '1';
-      }
-
-      window.addEventListener('vespa-splash-complete', reveal, { once: true });
-      // fallback -> jaga-jaga kalau event splash tidak pernah terpicu.
-      setTimeout(reveal, 6000);
-    })();
-  </script>
 </Layout>
