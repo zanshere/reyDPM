@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import ShinyText from '@/components/reactbits/ShinyText';
@@ -14,6 +15,9 @@ const ProductsContent: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [loadedIds, setLoadedIds] = useState<Set<number>>(new Set());
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => setMounted(true), []);
 
   const markLoaded = useCallback((id: number) => {
     setLoadedIds((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
@@ -35,6 +39,7 @@ const ProductsContent: React.FC = () => {
 
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    window.dispatchEvent(new CustomEvent('vespa-lenis-lock'));
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closeModal();
@@ -44,6 +49,7 @@ const ProductsContent: React.FC = () => {
     return () => {
       document.body.style.overflow = originalOverflow;
       window.removeEventListener('keydown', onKeyDown);
+      window.dispatchEvent(new CustomEvent('vespa-lenis-unlock'));
     };
   }, [modalOpen, closeModal]);
 
@@ -119,14 +125,16 @@ const ProductsContent: React.FC = () => {
         </div>
 
         {/* modal / quick preview */}
-        <div
-          className={`modal-overlay ${modalOpen ? 'open' : ''}`}
-          onClick={closeModal}
-          role="dialog"
-          aria-modal="true"
-          aria-hidden={!modalOpen}
-          aria-label={selectedProduct ? `Pratinjau ${selectedProduct.name}` : undefined}
-        >
+        {mounted &&
+        createPortal(
+          <div
+            className={`modal-overlay ${modalOpen ? 'open' : ''}`}
+            onClick={closeModal}
+            role="dialog"
+            aria-modal="true"
+            aria-hidden={!modalOpen}
+            aria-label={selectedProduct ? `Pratinjau ${selectedProduct.name}` : undefined}
+          >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             {selectedProduct && (
               <>
@@ -181,7 +189,9 @@ const ProductsContent: React.FC = () => {
               </>
             )}
           </div>
-        </div>
+        </div>,
+         document.body
+        )}
       </div>
     </section>
   );

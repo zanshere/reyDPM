@@ -158,8 +158,8 @@
   .product-card {
     cursor: pointer;
     transition:
-      transform 0.3s ease,
-      box-shadow 0.3s ease;
+      transform 0.3s ease-in-out,
+      box-shadow 0.3s ease-in-out;
   }
   .product-card:hover {
     transform: translateY(-4px);
@@ -176,8 +176,8 @@
     border-radius: 9999px;
     border: 1px solid rgb(0 0 0 / 0.08);
     transition:
-      background-color 0.2s ease,
-      transform 0.2s ease;
+      background-color 0.2s ease-in-out,
+      transform 0.2s ease-in-out;
   }
   .theme-btn:hover {
     transform: scale(1.06);
@@ -204,8 +204,8 @@
     opacity: 0;
     visibility: hidden;
     transition:
-      opacity 0.3s ease,
-      visibility 0.3s ease;
+      opacity 0.3s ease-in-out,
+      visibility 0.3s ease-in-out;
   }
   .modal-overlay.open {
     opacity: 1;
@@ -221,7 +221,7 @@
     background: #ffffff;
     padding: 1.5rem;
     transform: scale(0.95);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease-in-out;
   }
   .modal-overlay.open .modal-content {
     transform: scale(1);

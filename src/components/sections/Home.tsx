@@ -8,7 +8,6 @@ import StarBorder from '@/components/reactbits/StarBorder';
 import { Button } from '@/components/ui/button';
 import { LazyImage } from '@/components/lazy/LazyLoad';
 import { useTheme } from '@/hooks/useTheme';
-import * as Sentry from "@sentry/astro";
 
 const HERO_IMAGE_URL = '/hero-image.jpeg';
 
@@ -17,25 +16,11 @@ const HomeContent: React.FC = () => {
   const { lenis } = useLenis();
   const isDark = theme === 'dark';
   const accent = isDark ? '#facc15' : '#4f46e5';
-  const [revealed, setRevealed] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    if ((window as any).__vespaSplashComplete) {
-      setRevealed(true);
-      return;
-    }
-
-    const onSplashComplete = () => setRevealed(true);
-    window.addEventListener('vespa-splash-complete', onSplashComplete, { once: true });
-    return () => window.removeEventListener('vespa-splash-complete', onSplashComplete);
-  }, []);
 
   return (
     <section
       id="home"
-      className="section-padding relative flex min-h-screen items-center overflow-hidden"
+      className="relative flex min-h-screen items-center overflow-hidden pt-28 pb-16 sm:pt-32 sm:pb-20 lg:py-28"
       style={{
         background: isDark
           ? 'radial-gradient(ellipse at 30% 40%, #1a1a2e 0%, #0d0d0d 70%)'
@@ -48,7 +33,7 @@ const HomeContent: React.FC = () => {
           <motion.div
             className="space-y-6"
             initial={{ opacity: 0, y: 24 }}
-            animate={revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: 'easeOut' }}
           >
             <div className="text-sm font-medium uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
@@ -96,7 +81,7 @@ const HomeContent: React.FC = () => {
           <div className="relative flex justify-center lg:justify-end">
             <motion.div
               initial={{ opacity: 0, scale: 0.92 }}
-              animate={revealed ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1.2, ease: 'easeOut' }}
               className="w-full max-w-lg lg:max-w-xl xl:max-w-2xl"
             >
@@ -123,14 +108,6 @@ const HomeContent: React.FC = () => {
     </section>
   );
 };
-
-function TestButton() {
-  return (
-    <button onClick={() => Sentry.captureException(new Error("Tes manual dari tombol!"))}>
-      Kirim Error ke Sentry
-    </button>
-  );
-}
 
 const Home: React.FC = () => (
   <ThemeProvider>

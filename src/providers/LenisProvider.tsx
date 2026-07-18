@@ -70,6 +70,10 @@ export const LenisProvider: React.FC<LenisProviderProps> = ({
     const handleResize = () => ScrollTrigger.refresh();
     window.addEventListener('resize', handleResize);
     const timeoutId = setTimeout(refreshScrollTrigger, 100);
+    const handleLenisLock = () => lenis.stop();
+    const handleLenisUnlock = () => lenis.start();
+    window.addEventListener('vespa-lenis-lock', handleLenisLock);
+    window.addEventListener('vespa-lenis-unlock', handleLenisUnlock);
 
     const NAVBAR_OFFSET = -96; // kompensasi tinggi navbar fixed
 
@@ -134,6 +138,8 @@ export const LenisProvider: React.FC<LenisProviderProps> = ({
       window.removeEventListener(PAGE_TRANSITION_EVENT, handlePageTransition);
       cancelAnimationFrame(rafId);
       clearTimeout(timeoutId);
+      window.removeEventListener('vespa-lenis-lock', handleLenisLock);
+      window.removeEventListener('vespa-lenis-unlock', handleLenisUnlock);
     };
   }, []);
 
