@@ -3,6 +3,7 @@ import '@/styles/globals.css';
 import { Spinner } from '@/components/ui/spinner';
 import Analytics from '@vercel/analytics/astro';
 import SpeedInsights from "@vercel/speed-insights/astro"
+import CookieConsent from '@/components/CookieConsent.astro';
 
 export interface Props {
   title: string;
@@ -57,14 +58,39 @@ const schemaList = Array.isArray(structuredData)
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
+    <!-- Google Consent Mode v2: default DENIED sampai user menentukan pilihan.
+         Wajib dieksekusi SEBELUM library gtag.js di-load, apa pun urutan blok di bawah. -->
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { window.dataLayer.push(arguments); }
+      window.gtag = gtag;
+
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+      });
+
+      // Pulihkan keputusan consent yang sudah pernah dibuat user sebelumnya.
+      try {
+        var storedConsent = localStorage.getItem('vespa-cookie-consent');
+        if (storedConsent === 'granted') {
+          gtag('consent', 'update', {
+            ad_storage: 'granted',
+            ad_user_data: 'granted',
+            ad_personalization: 'granted',
+            analytics_storage: 'granted',
+          });
+        }
+      } catch (e) {}
+    </script>
+
     {isProd && gaMeasurementId && (
       <>
         <!-- Google tag (gtag.js) -->
         <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}></script>
         <script define:vars={{ gaMeasurementId }}>
-          const win = window;
-          win.dataLayer = win.dataLayer || [];
-          function gtag(...args) { win.dataLayer.push(args); }
           gtag('js', new Date());
           gtag('config', gaMeasurementId);
         </script>
@@ -239,6 +265,7 @@ const schemaList = Array.isArray(structuredData)
         });
       });
     </script>
+    <CookieConsent />
     <Analytics />
     <SpeedInsights />
   </body>
