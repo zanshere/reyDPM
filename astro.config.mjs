@@ -11,7 +11,7 @@ import swup from '@swup/astro';
 
 // https://astro.build/config
 export default defineConfig({
-  site: import.meta.env.PUBLIC_SITE_URL || 'https://reyvespadpm.vercel.app/',
+  site: import.meta.env.PUBLIC_SITE_URL || 'https://reyvespadpm.vercel.app',
   integrations: [
     react(),
     swup({
@@ -28,8 +28,22 @@ export default defineConfig({
       org: import.meta.env.SENTRY_ORG,
       authToken: import.meta.env.SENTRY_AUTH_TOKEN,
     }),
-    sitemap(),
-    robotsTxt(),
+    sitemap({
+      changefreq: 'weekly',
+      priority: 0.7,
+      lastmod: new Date(),
+      // Halaman error tidak perlu diindeks Google.
+      filter: (page) => !page.includes('/404'),
+    }),
+    robotsTxt({
+      sitemapBaseFileName: 'sitemap',
+      policy: [
+        {
+          userAgent: '*',
+          allow: '/',
+        },
+      ],
+    }),
   ],
   vite: {
     plugins: [tailwindcss()],
