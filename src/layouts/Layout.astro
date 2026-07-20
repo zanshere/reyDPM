@@ -83,13 +83,25 @@ const schemaList = Array.isArray(structuredData)
       window.gtag = gtag;
 
       gtag('consent', 'default', {
+        ad_storage: 'granted',
+        ad_user_data: 'granted',
+        ad_personalization: 'granted',
+        analytics_storage: 'granted',
+        wait_for_update: 500,
+      });
+
+      gtag('consent', 'default', {
         ad_storage: 'denied',
         ad_user_data: 'denied',
         ad_personalization: 'denied',
         analytics_storage: 'denied',
+        region: [
+          'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR',
+          'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK',
+          'SI', 'ES', 'SE', 'IS', 'LI', 'NO', 'GB', 'CH',
+        ],
       });
 
-      // Pulihkan keputusan consent yang sudah pernah dibuat user sebelumnya.
       try {
         var storedConsent = localStorage.getItem('vespa-cookie-consent');
         if (storedConsent === 'granted') {
@@ -98,6 +110,13 @@ const schemaList = Array.isArray(structuredData)
             ad_user_data: 'granted',
             ad_personalization: 'granted',
             analytics_storage: 'granted',
+          });
+        } else if (storedConsent === 'denied') {
+          gtag('consent', 'update', {
+            ad_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied',
+            analytics_storage: 'denied',
           });
         }
       } catch (e) {}
@@ -178,7 +197,7 @@ const schemaList = Array.isArray(structuredData)
   </head>
   <body class="font-sans antialiased bg-background text-foreground">
     <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W68PT7M7"
+    <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     <div
