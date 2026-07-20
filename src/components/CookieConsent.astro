@@ -77,7 +77,15 @@ const STORAGE_KEY = 'vespa-cookie-consent';
       return;
     }
 
-    showBanner();
+    var revealed = false;
+    function revealBanner() {
+      if (revealed) return;
+      revealed = true;
+      showBanner();
+    }
+
+    window.addEventListener('vespa-splash-complete', revealBanner, { once: true });
+    setTimeout(revealBanner, 4000);
 
     document.getElementById('cookie-consent-accept')?.addEventListener('click', function () {
       try {
