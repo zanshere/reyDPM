@@ -60,9 +60,8 @@ const schemaList = Array.isArray(structuredData)
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
-  <!-- Google Tag Manager -->
-  <script is:inline define:vars={{ gtmId }}></script>
-  <script is:inline>
+<!-- Google Tag Manager -->
+ <script is:inline define:vars={{ gtmId }}>
   (function(w,d,s,l,i){
     w[l]=w[l]||[];
     w[l].push({'gtm.start':
@@ -196,10 +195,12 @@ const schemaList = Array.isArray(structuredData)
     ))}
   </head>
   <body class="font-sans antialiased bg-background text-foreground">
+
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
+     
     <div
       id="page-loader"
       class="fixed inset-0 z-10000 flex items-center justify-center bg-[#fafaf8] transition-opacity duration-300 ease-out dark:bg-[#0a0a0a]"
