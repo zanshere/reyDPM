@@ -36,7 +36,6 @@ export default defineConfig({
       filter: (page) => !page.includes('/404'),
     }),
     robotsTxt({
-      sitemapBaseFileName: 'sitemap',
       policy: [
         {
           userAgent: '*',
