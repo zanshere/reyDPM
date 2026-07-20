@@ -32,6 +32,8 @@ const gaMeasurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
 const isProd = import.meta.env.DEV;
 
+const gtmId = import.meta.env.PUBLIC_GTM_ID;
+
 const localBusinessSchema = {
   '@context': 'https://schema.org',
   '@type': 'AutomotiveBusiness',
@@ -58,8 +60,23 @@ const schemaList = Array.isArray(structuredData)
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
-    <!-- Google Consent Mode v2: default DENIED sampai user menentukan pilihan.
-         Wajib dieksekusi SEBELUM library gtag.js di-load, apa pun urutan blok di bawah. -->
+  <!-- Google Tag Manager -->
+  <script is:inline define:vars={{ gtmId }}></script>
+  <script is:inline>
+  (function(w,d,s,l,i){
+    w[l]=w[l]||[];
+    w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});
+    var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),
+    dl=l!='dataLayer'?'&l='+l:'';
+    j.async=true;
+    j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+    f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer', gtmId);
+  </script>
+  <!-- End Google Tag Manager -->
+
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
       function gtag() { window.dataLayer.push(arguments); }
@@ -160,6 +177,10 @@ const schemaList = Array.isArray(structuredData)
     ))}
   </head>
   <body class="font-sans antialiased bg-background text-foreground">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W68PT7M7"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <div
       id="page-loader"
       class="fixed inset-0 z-10000 flex items-center justify-center bg-[#fafaf8] transition-opacity duration-300 ease-out dark:bg-[#0a0a0a]"
