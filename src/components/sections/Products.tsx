@@ -8,6 +8,7 @@ import StarBorder from '@/components/reactbits/StarBorder';
 import { LazyImage } from '@/components/lazy/LazyLoad';
 import { useTheme } from '@/hooks/useTheme';
 import { productsData, type Product } from '@/data/products';
+import { trackEvent } from "@/lib/analytics";
 
 const ProductsContent: React.FC = () => {
   const { theme } = useTheme();
@@ -24,14 +25,27 @@ const ProductsContent: React.FC = () => {
   }, []);
 
   const openModal = (product: Product) => {
+    trackEvent("product_modal_open", {
+      product_name: product.name,
+      product_slug: product.slug,
+      product_price: product.price,
+    });
+
     setSelectedProduct(product);
     setModalOpen(true);
   };
 
   const closeModal = useCallback(() => {
+    if (selectedProduct) {
+      trackEvent("product_modal_close", {
+        product_name: selectedProduct.name,
+        product_slug: selectedProduct.slug,
+      });
+    }
+
     setModalOpen(false);
     setTimeout(() => setSelectedProduct(null), 300);
-  }, []);
+  }, [selectedProduct]);
 
   // Kunci scroll body + tutup dengan ESC selama modal quick-preview terbuka
   useEffect(() => {
@@ -68,7 +82,7 @@ const ProductsContent: React.FC = () => {
             duration={1.3}
           />
           <p className="mx-auto max-w-md text-gray-500 dark:text-gray-400">
-            Empat model ikonik, masing-masing dengan karakternya sendiri. Temukan yang paling cocok
+            Lima model ikonik, masing-masing dengan karakternya sendiri. Temukan yang paling cocok
             dengan gayamu.
           </p>
         </div>
@@ -114,7 +128,7 @@ const ProductsContent: React.FC = () => {
                   </p>
                   <div className="flex items-center justify-between pt-1">
                     <span className="font-semibold text-primary dark:text-yellow-400">
-                      {product.price}
+                      {product.formattedPrice}
                     </span>
                     <span className="text-xs text-gray-400 dark:text-gray-500">Tap untuk lihat</span>
                   </div>
@@ -135,7 +149,17 @@ const ProductsContent: React.FC = () => {
             aria-hidden={!modalOpen}
             aria-label={selectedProduct ? `Pratinjau ${selectedProduct.name}` : undefined}
           >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={(e) => { e.stopPropagation();
+                if (selectedProduct) {
+                  trackEvent("product_detail_view", {
+                    product_name: selectedProduct.name,
+                    product_slug: selectedProduct.slug,
+                    product_price: selectedProduct.price,
+                  });
+                }
+
+                closeModal();
+              }}>
             {selectedProduct && (
               <>
                 <button
@@ -171,7 +195,7 @@ const ProductsContent: React.FC = () => {
                 </div>
                 <div className="mt-4 flex items-center justify-between">
                   <span className="text-xl font-bold text-primary dark:text-yellow-400">
-                    {selectedProduct.price}
+                    {selectedProduct.formattedPrice}
                   </span>
                   <StarBorder color={accent} speed="3s" thickness={3}>
                     <a
