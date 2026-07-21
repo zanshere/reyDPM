@@ -2,6 +2,7 @@ import React from 'react';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import StaggeredMenu from '@/components/reactbits/StaggeredMenu';
 import { useTheme } from '@/hooks/useTheme';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { INSTAGRAM_URL, TIKTOK_URL } from '@/data/dealer';
 import { Sun, Moon } from 'lucide-react';
 
@@ -20,6 +21,7 @@ const Logo: React.FC<{ isDark: boolean }> = ({ isDark }) => (
 
 const NavbarContent: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const analytics = useAnalytics();
   const isDark = theme === 'dark';
 
   // Hanya tampilkan link sosial yang memang diisi di .env.
@@ -28,8 +30,14 @@ const NavbarContent: React.FC = () => {
     TIKTOK_URL && { label: 'TikTok', link: TIKTOK_URL },
   ].filter((item): item is { label: string; link: string } => Boolean(item));
 
+  const handleThemeToggle = () => {
+    // isDark masih merefleksikan tema SEBELUM toggle, jadi tema baru adalah kebalikannya.
+    analytics.trackThemeChange(isDark ? 'light' : 'dark');
+    toggleTheme();
+  };
+
   const ThemeToggle: React.FC<{ className?: string }> = ({ className = 'theme-btn' }) => (
-    <button type="button" onClick={toggleTheme} className={className} aria-label="Ubah tema">
+    <button type="button" onClick={handleThemeToggle} className={className} aria-label="Ubah tema">
       {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
     </button>
   );

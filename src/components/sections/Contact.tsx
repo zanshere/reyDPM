@@ -6,10 +6,13 @@ import SplitText from '@/components/reactbits/SplitText';
 import StarBorder from '@/components/reactbits/StarBorder';
 import { LazyReveal } from '@/components/lazy/LazyLoad';
 import { useTheme } from '@/hooks/useTheme';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { AnalyticsSource } from '@/lib/analytics.constant';
 import { DEALER_NAME, buildWhatsAppLink } from '@/data/dealer';
 
 const ContactContent: React.FC = () => {
   const { theme } = useTheme();
+  const analytics = useAnalytics();
   const isDark = theme === 'dark';
   const accent = isDark ? '#facc15' : '#4f46e5';
 
@@ -47,6 +50,7 @@ const ContactContent: React.FC = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-4 py-1 font-medium text-white no-underline"
+                onClick={() => analytics.trackWhatsApp(AnalyticsSource.CONTACT_SECTION)}
               >
                 <MessageCircle className="size-4" />
                 Chat via WhatsApp
@@ -59,7 +63,6 @@ const ContactContent: React.FC = () => {
   );
 };
 
-/** Self-wrapped ThemeProvider — menggantikan ContactIsland.tsx yang dihapus. */
 const Contact: React.FC = () => (
   <ThemeProvider>
     <ContactContent />

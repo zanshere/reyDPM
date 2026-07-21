@@ -5,6 +5,7 @@ export const AnalyticsEvent = {
   GALLERY_INTERACTION: "gallery_interaction",
   THEME_CHANGE: "theme_change",
   FAQ_OPEN: "faq_open",
+  SOCIAL_CLICK: "social_click",
   VIRTUAL_PAGE_VIEW: "virtual_pageview",
 } as const;
 
@@ -12,6 +13,7 @@ export const AnalyticsSource = {
   PRODUCTS_SECTION: "products_section",
   PRODUCT_HERO: "product_hero",
   PRODUCT_INTEREST: "product_interest",
+  CONTACT_SECTION: "contact_section",
   HOMEPAGE: "homepage",
   NAVBAR: "navbar",
   FOOTER: "footer",
