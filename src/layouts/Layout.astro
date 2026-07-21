@@ -28,9 +28,7 @@ const dealerName = import.meta.env.PUBLIC_DEALER_NAME;
 const instagramUrl = import.meta.env.PUBLIC_INSTAGRAM_URL;
 const tiktokUrl = import.meta.env.PUBLIC_TIKTOK_URL;
 
-const gaMeasurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
-const isProd = import.meta.env.PROD;
 
 const gtmId = import.meta.env.PUBLIC_GTM_ID;
 
@@ -120,17 +118,6 @@ const schemaList = Array.isArray(structuredData)
         }
       } catch (e) {}
     </script>
-
-    {isProd && gaMeasurementId && (
-      <>
-        <!-- Google tag (gtag.js) -->
-        <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}></script>
-        <script define:vars={{ gaMeasurementId }}>
-          gtag('js', new Date());
-          gtag('config', gaMeasurementId, { cookie_domain: 'none' });
-        </script>
-      </>
-    )}
     <meta charset="UTF-8" />
     <script is:inline>
       if ('scrollRestoration' in history) {
@@ -272,6 +259,8 @@ const schemaList = Array.isArray(structuredData)
     <script>
       import { gsap } from 'gsap';
       import { ScrollTrigger } from 'gsap/ScrollTrigger';
+      import { trackEvent } from '@/lib/analytics';
+      import { AnalyticsEvent } from '@/lib/analytics.constant';
 
       gsap.registerPlugin(ScrollTrigger);
 
@@ -303,6 +292,11 @@ const schemaList = Array.isArray(structuredData)
           hideOverlay();
           window.dispatchEvent(new CustomEvent('vespa-page-transition'));
           requestAnimationFrame(() => ScrollTrigger.refresh());
+          trackEvent(AnalyticsEvent.VIRTUAL_PAGE_VIEW, {
+            page_path: window.location.pathname,
+            page_title: document.title,
+            page_location: window.location.href,
+          });
         });
       });
     </script>
