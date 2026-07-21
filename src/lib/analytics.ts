@@ -4,22 +4,9 @@ declare global {
   }
 }
 
-export type AnalyticsEvent =
-  | "product_modal_open"
-  | "product_detail_view"
-  | "whatsapp_click"
-  | "faq_open"
-  | "theme_change"
-  | "contact_click"
-  | "scroll_90";
-
-export interface AnalyticsEventParams {
-  [key: string]: unknown;
-}
-
 export function trackEvent(
   event: string,
-  params: AnalyticsEventParams = {}
+  params: Record<string, unknown> = {}
 ) {
   if (typeof window === "undefined") return;
 

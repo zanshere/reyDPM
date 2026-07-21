@@ -8,16 +8,17 @@ import StarBorder from '@/components/reactbits/StarBorder';
 import { LazyImage } from '@/components/lazy/LazyLoad';
 import { useTheme } from '@/hooks/useTheme';
 import { productsData, type Product } from '@/data/products';
-import { trackEvent } from "@/lib/analytics";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 const ProductsContent: React.FC = () => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const analytics = useAnalytics();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [loadedIds, setLoadedIds] = useState<Set<number>>(new Set());
   const [mounted, setMounted] = useState(false);
-  
+
   useEffect(() => setMounted(true), []);
 
   const markLoaded = useCallback((id: number) => {
@@ -25,27 +26,21 @@ const ProductsContent: React.FC = () => {
   }, []);
 
   const openModal = (product: Product) => {
-    trackEvent("product_modal_open", {
-      product_name: product.name,
-      product_slug: product.slug,
-      product_price: product.price,
+    analytics.trackProductModal({
+      productName: product.name,
+      productSlug: product.slug,
+      productPrice: product.price,
     });
 
     setSelectedProduct(product);
     setModalOpen(true);
   };
 
+  // select_item cukup fire sekali saat modal dibuka — tidak perlu fire ulang saat ditutup.
   const closeModal = useCallback(() => {
-    if (selectedProduct) {
-      trackEvent("product_modal_close", {
-        product_name: selectedProduct.name,
-        product_slug: selectedProduct.slug,
-      });
-    }
-
     setModalOpen(false);
     setTimeout(() => setSelectedProduct(null), 300);
-  }, [selectedProduct]);
+  }, []);
 
   // Kunci scroll body + tutup dengan ESC selama modal quick-preview terbuka
   useEffect(() => {
@@ -150,14 +145,6 @@ const ProductsContent: React.FC = () => {
             aria-label={selectedProduct ? `Pratinjau ${selectedProduct.name}` : undefined}
           >
           <div className="modal-content" onClick={(e) => { e.stopPropagation();
-                if (selectedProduct) {
-                  trackEvent("product_detail_view", {
-                    product_name: selectedProduct.name,
-                    product_slug: selectedProduct.slug,
-                    product_price: selectedProduct.price,
-                  });
-                }
-
                 closeModal();
               }}>
             {selectedProduct && (
@@ -221,7 +208,6 @@ const ProductsContent: React.FC = () => {
   );
 };
 
-/** Self-wrapped ThemeProvider — menggantikan ProductsIsland.tsx yang dihapus. */
 const Products: React.FC = () => (
   <ThemeProvider>
     <ProductsContent />

@@ -19,7 +19,7 @@ interface Props {
 const { product } = Astro.props;
 
 // Rich snippet Product (harga, ketersediaan, brand) untuk hasil pencarian Google.
-const priceValue = product.price.replace(/[^0-9]/g, '');
+const priceValue = product.price.toString().replace(/[^0-9]/g, '');
 const productSchema = {
   '@context': 'https://schema.org',
   '@type': 'Product',
