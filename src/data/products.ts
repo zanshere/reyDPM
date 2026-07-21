@@ -5,7 +5,8 @@ export interface Product {
   tagline: string;
   description: string;
   fullDescription: string;
-  price: string;
+  price: number;
+  formattedPrice: string;
   /** Format "Label: Nilai" — dipecah otomatis di halaman detail */
   specs: string[];
   /** Poin-poin keunggulan produk, ditampilkan sebagai badge di halaman detail */
@@ -24,7 +25,8 @@ export const productsData: Product[] = [
     tagline: 'Dinamis Klasik. Sporty. Iconic.',
     description: 'Vespa Sprint 180 2026 hadir sebagai ikon sporti yang memadukan semangat berani dengan teknologi modern. Skuter elegan yang memikat perhatian lewat garis-garis dinamis dan sentuhan akhir premium.',
     fullDescription: 'Vespa Sprint 180 2026 adalah perwujudan semangat muda yang berani dan ekspresif. Mengusung mesin i‑get 180 cc generasi terbaru yang merupakan evolusi dari mesin 150 cc sebelumnya, skuter ini menawarkan lompatan tenaga signifikan hingga 24% menjadi 11 kW di 8.250 rpm serta peningkatan torsi 8%. Dengan sekitar 14% komponen utama mesin yang dikembangkan sepenuhnya baru, termasuk sistem transmisi CVT terbaru yang menghadirkan respons throttle lebih halus dan presisi, Sprint 180 2026 siap menemani setiap perjalanan urban dengan performa yang lincah dan bertenaga.',
-    price: 'Rp 58.500.000',
+    price: 58500000,
+    formattedPrice: "Rp 58.500.000",
     specs: ['Mesin: 174.1 cc', 'Daya Maksimum: 11 kW @ 8.250 rpm', 'Torsi Maksimum: 13.7 Nm @ 6.500 rpm', 'Transmisi: CVT', 'Sistem Pembakaran: Injeksi Elektronik', 'Sistem Pendingin: Sirkulasi Udara Tekan', 'Kapasitas Tangki: 7.5 (± 0.6) L', 'ABS: Depan'],
     features: ['Keyless System', 'ABS (Anti-lock Braking System)', 'Dual Channel ABS (varian Tech)'],
     images: [
@@ -40,7 +42,8 @@ export const productsData: Product[] = [
     tagline: 'Gairah Baru. Canggih Ikonik. Bertenaga Klasik.',
     description: 'Vespa Primavera 2026 memadukan desain klasik dengan teknologi modern. Skuter elegan yang memikat perhatian lewat garis-garis ikonik dan sentuhan akhir premium.',
     fullDescription: 'Vespa Primavera 2026 hadir sebagai ikon gaya hidup urban yang memadukan keanggunan desain Italia dengan performa masa kini. Mengusung mesin i‑get 180 cc generasi terbaru yang merupakan evolusi dari mesin 150 cc sebelumnya, skuter ini menawarkan lompatan tenaga signifikan hingga 24% menjadi 11 kW di 8.250 rpm serta peningkatan torsi 8%. Dengan sekitar 14% komponen utama mesin yang dikembangkan sepenuhnya baru, termasuk sistem transmisi CVT terbaru yang menghadirkan respons throttle lebih halus dan presisi, Primavera 2026 siap menemani setiap perjalanan urban dengan performa yang lincah dan bertenaga.',
-    price: 'Rp 55.000.000',
+    price: 55000000,
+    formattedPrice: "Rp 55.000.000",
     specs: ['Mesin: 174.1 cc', 'Daya Maksimum: 11 kW @ 8.250 rpm', 'Torsi Maksimum: 13.7 Nm @ 6.500 rpm', 'Transmisi: CVT', 'Sistem Pembakaran: Injeksi Elektronik', 'Sistem Pendingin: Sirkulasi Udara Tekan', 'Kapasitas Tangki: 7.5 (± 0.6) L', 'ABS: Depan'],
     features: ['Mesin i‑get 180 cc', 'Keyless System', 'ABS (Anti-lock Braking System)'],
     images: [
@@ -60,7 +63,8 @@ export const productsData: Product[] = [
     tagline: 'Klasik Urban. Gaya Terjangkau. Ikon Sejati.',
     description: 'Vespa LX 150 2026 memadukan desain klasik dengan teknologi modern. Skuter elegan yang memikat perhatian lewat garis-garis ikonik dan sentuhan akhir premium.',
     fullDescription: 'Ditenagai mesin i‑get 154,8 cc yang responsif dan halus, Vespa LX 150 2026 hadir sebagai teman urban andal untuk melintasi padatnya lalu lintas dengan tetap mengusung gaya khas Italia. Bodi baja monokok yang kokoh, lampu bundar LED yang ikonik, serta pilihan warna baru seperti Lilac Euforico dan Green Amabile membuat skuter ini bukan sekadar kendaraan, melainkan pernyataan gaya yang tak lekang waktu.',
-    price: 'Rp 46.500.000',
+    price: 46500000,
+    formattedPrice: "Rp 46.500.000",
     specs: ['Mesin: 154.8 cc', 'Daya Maksimum: 9.2 kW @ 7.750 rpm', 'Torsi Maksimum: 12.4 Nm @ 6.750 rpm', 'Transmisi: CVT', 'Sistem Pembakaran: Injeksi Elektronik', 'Sistem Pendingin: Sirkulasi Udara Tekan', 'Kapasitas Tangki: 7.5 (± 0.5) L'],
     features: ['Lampu LED penuh', 'Port USB charging', 'Immobilizer', 'Bodi baja monokok'],
     images: [
@@ -79,7 +83,8 @@ export const productsData: Product[] = [
     tagline: 'Dinamis Masa Kini.',
     description: 'Vespa Sprint S 180 2026 memadukan desain sporti dengan teknologi mutakhir. Skuter ekspresif yang memikat perhatian lewat garis-garis tegas dan sentuhan akhir yang berani.',
     fullDescription: 'Vespa Sprint S 180 2026 adalah perwujudan semangat muda yang berani dan ekspresif, menghadirkan tampilan sporti dengan side grid anyar yang mempertegas karakter dinamisnya. Mengusung mesin i‑get 180 cc generasi terbaru yang merupakan evolusi dari mesin 150 cc sebelumnya, skuter ini menawarkan lompatan tenaga signifikan hingga 24% menjadi 11 kW pada 8.250 rpm serta peningkatan torsi sebesar 8%. Dengan sekitar 14% komponen utama mesin yang dikembangkan sepenuhnya baru, termasuk sistem transmisi CVT terbaru yang menghadirkan respons throttle lebih halus dan presisi, Sprin',
-    price: 'Rp 61.000.000',
+    price: 51000000,
+    formattedPrice: "Rp 51.000.000",
     specs: ['Mesin: 174.1 cc', 'Daya Maksimum: 11 kW @ 8.250 rpm', 'Torsi Maksimum: 13.7 Nm @ 6.500 rpm', 'Transmisi: CVT', 'Sistem Pembakaran: Injeksi Elektronik', 'Sistem Pendingin: Sirkulasi Udara Tekan', 'Kapasitas Tangki: 7.5 (± 0.6) L ', 'ABS: Depan'],
     features: ['Keyless System', 'ABS (Anti-lock Braking System)', 'MIA Connectivity', 'Sporty Design'],
     images: [
@@ -99,7 +104,8 @@ export const productsData: Product[] = [
     tagline: 'Sporty Canggih.',
     description: 'Vespa Sprint Tech 2026 memadukan desain sporti dengan teknologi mutakhir. Skuter digital yang memikat perhatian lewat layar canggih dan performa mesin 180 cc terbaru.',
     fullDescription: 'Vespa Sprint Tech 2026 adalah puncak dari inovasi teknologi dalam keluarga Sprint, menghadirkan pengalaman berkendara yang lebih modern dan terhubung. Mengusung mesin i‑get 180 cc generasi terbaru yang merupakan evolusi dari mesin 150 cc sebelumnya, skuter ini menawarkan lompatan tenaga signifikan hingga 24% menjadi 11 kW pada 8.250 rpm serta peningkatan torsi sebesar 8%. Dengan sekitar 14% komponen utama mesin yang dikembangkan sepenuhnya baru, termasuk sistem transmisi CVT terbaru yang menghadirkan respons throttle lebih halus dan presisi, Sprint Tech 2026 siap menemani setiap perjalanan urban dengan performa yang lincah dan bertenaga.',
-    price: 'Rp 61.000.000',
+    price: 60500000,
+    formattedPrice: "Rp 61.000.000",
     specs: ['Mesin: 174.1 cc', 'Daya Maksimum: 11 kW @ 8.250 rpm', 'Torsi Maksimum: 13.7 Nm @ 6.500 rpm', 'Transmisi: CVT', 'Sistem Pembakaran: Injeksi Elektronik', 'Sistem Pendingin: Sirkulasi Udara Tekan', 'Kapasitas Tangki: 7.5 (± 0.6) L', 'ABS: Depan Belakang'],
     features: ['Mesin i‑get 180 cc', 'MIA Connectivity', 'Keyless System', 'Dual Channel ABS', 'Desain sporty eksklusif'],
     images: [

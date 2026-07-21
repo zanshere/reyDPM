@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { LenisProvider, useLenis } from '@/providers/LenisProvider';
 import { useTheme } from '@/hooks/useTheme';
+import { useAnalytics } from "@/hooks/useAnalytics";
 import { buildProductWhatsAppMessage, buildWhatsAppLink } from '@/data/dealer';
 import type { Product } from '@/data/products';
 
@@ -23,6 +24,7 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({ product }) => {
   const isDark = theme === 'dark';
   const { lenis } = useLenis();
   const rootRef = useRef<HTMLDivElement>(null);
+  const analytics = useAnalytics();
 
   useEffect(() => {
     if (typeof window === 'undefined' || !rootRef.current) return;
@@ -52,6 +54,14 @@ const ProductDetailContent: React.FC<ProductDetailProps> = ({ product }) => {
       animations.forEach((anim) => anim.scrollTrigger?.kill());
       window.removeEventListener('load', refresh);
     };
+  }, [product.slug]);
+
+  useEffect(() => {
+    analytics.trackProductView({
+      productName: product.name,
+      productSlug: product.slug,
+      productPrice: product.price,
+    });
   }, [product.slug]);
 
   const gallery = [product.thumbnail, ...product.images];

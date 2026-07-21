@@ -1,10 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { motion, AnimatePresence, type PanInfo } from 'motion/react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
-import type Lenis from 'lenis';
-import { LazyImage } from '@/components/lazy/LazyLoad';
-import { Skeleton } from '@/components/ui/skeleton';
+import React, { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { motion, AnimatePresence, type PanInfo } from "motion/react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import type Lenis from "lenis";
+import { LazyImage } from "@/components/lazy/LazyLoad";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAnalytics } from "@/hooks/useAnalytics";
+import { GalleryAction } from "@/lib/analytics.constant";
 
 interface ProductGalleryProps {
   images: string[];
@@ -14,7 +16,12 @@ interface ProductGalleryProps {
 
 const SWIPE_THRESHOLD = 60;
 
-const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productName, lenis }) => {
+const ProductGallery: React.FC<ProductGalleryProps> = ({
+  images,
+  productName,
+  lenis,
+}) => {
+  const analytics = useAnalytics();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const isOpen = activeIndex !== null;
   const [mounted, setMounted] = useState(false);
@@ -27,42 +34,56 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productName, le
   const close = useCallback(() => setActiveIndex(null), []);
 
   const showPrev = useCallback(() => {
-    setActiveIndex((current) =>
-      current === null ? current : (current - 1 + images.length) % images.length
-    );
-  }, [images.length]);
+    setActiveIndex((current) => {
+      if (current === null) return current;
+
+      const prev = (current - 1 + images.length) % images.length;
+
+      analytics.trackGallery(GalleryAction.PREVIOUS, productName, prev + 1);
+
+      return prev;
+    });
+  }, [analytics, images.length, productName]);
 
   const showNext = useCallback(() => {
-    setActiveIndex((current) => (current === null ? current : (current + 1) % images.length));
-  }, [images.length]);
+    setActiveIndex((current) => {
+      if (current === null) return current;
+
+      const next = (current + 1) % images.length;
+
+      analytics.trackGallery(GalleryAction.NEXT, productName, next + 1);
+
+      return next;
+    });
+  }, [analytics, images.length, productName]);
 
   useEffect(() => {
-      if (!isOpen) return;
+    if (!isOpen) return;
 
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      lenis?.stop();
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    lenis?.stop();
 
-      const onKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') close();
-        if (e.key === 'ArrowLeft') showPrev();
-        if (e.key === 'ArrowRight') showNext();
-      };
-      window.addEventListener('keydown', onKeyDown);
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+      if (e.key === "ArrowLeft") showPrev();
+      if (e.key === "ArrowRight") showNext();
+    };
+    window.addEventListener("keydown", onKeyDown);
 
-      return () => {
-        document.body.style.overflow = originalOverflow;
-        window.removeEventListener('keydown', onKeyDown);
-        lenis?.start();
-      };
-    }, [isOpen, close, showPrev, showNext, lenis]);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+      lenis?.start();
+    };
+  }, [isOpen, close, showPrev, showNext, lenis]);
 
   const handleDragEnd = useCallback(
     (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
       if (info.offset.x <= -SWIPE_THRESHOLD) showNext();
       else if (info.offset.x >= SWIPE_THRESHOLD) showPrev();
     },
-    [showNext, showPrev]
+    [showNext, showPrev],
   );
 
   if (images.length === 0) return null;
@@ -74,10 +95,13 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productName, le
           <motion.button
             key={src}
             type="button"
-            onClick={() => setActiveIndex(idx)}
+            onClick={() => {
+              analytics.trackGallery(GalleryAction.OPEN, productName, idx + 1);
+              setActiveIndex(idx);
+            }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
+            viewport={{ once: true, margin: "-40px" }}
             transition={{ duration: 0.5, delay: idx * 0.05 }}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
@@ -107,98 +131,105 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({ images, productName, le
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
               >
-            <motion.div
-              className="relative flex w-full max-w-4xl flex-col items-center"
-              onClick={(e) => e.stopPropagation()}
-              initial={{ scale: 0.94, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.94, opacity: 0 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-            >
-              <button
-                type="button"
-                onClick={close}
-                className="absolute -top-12 right-0 flex h-10 w-10 items-center justify-center rounded-full border-0 bg-white/90 text-gray-800 shadow-md transition-colors hover:bg-white sm:-top-3 sm:-right-14"
-                aria-label="Tutup galeri"
-              >
-                <X className="size-5" />
-              </button>
-
-              <div className="relative mx-auto flex w-full max-w-[min(85vw,70vh)] items-center justify-center">
-                {images.length > 1 && (
+                <motion.div
+                  className="relative flex w-full max-w-4xl flex-col items-center"
+                  onClick={(e) => e.stopPropagation()}
+                  initial={{ scale: 0.94, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.94, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                >
                   <button
                     type="button"
-                    onClick={showPrev}
-                    aria-label="Foto sebelumnya"
-                    className="absolute left-1 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur-md transition-colors hover:bg-black/60 sm:-left-14 sm:h-11 sm:w-11"
+                    onClick={close}
+                    className="absolute -top-12 right-0 flex h-10 w-10 items-center justify-center rounded-full border-0 bg-white/90 text-gray-800 shadow-md transition-colors hover:bg-white sm:-top-3 sm:-right-14"
+                    aria-label="Tutup galeri"
                   >
-                    <ChevronLeft className="size-5" />
+                    <X className="size-5" />
                   </button>
-                )}
 
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeIndex}
-                    className="relative aspect-square w-full"
-                    initial={{ opacity: 0, x: 24 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -24 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {!loadedSrcs.has(images[activeIndex ?? 0]) && (
-                      <Skeleton className="absolute inset-0 h-full w-full rounded-2xl" />
+                  <div className="relative mx-auto flex w-full max-w-[min(85vw,70vh)] items-center justify-center">
+                    {images.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={showPrev}
+                        aria-label="Foto sebelumnya"
+                        className="absolute left-1 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur-md transition-colors hover:bg-black/60 sm:-left-14 sm:h-11 sm:w-11"
+                      >
+                        <ChevronLeft className="size-5" />
+                      </button>
                     )}
-                    <motion.img
-                      src={images[activeIndex ?? 0]}
-                      alt={`${productName} — foto ${(activeIndex ?? 0) + 1}`}
-                      drag={images.length > 1 ? 'x' : false}
-                      dragConstraints={{ left: 0, right: 0 }}
-                      dragElastic={0.7}
-                      onDragEnd={handleDragEnd}
-                      onLoad={() => markSrcLoaded(images[activeIndex ?? 0])}
-                      className={`h-full w-full touch-pan-y select-none rounded-2xl object-cover transition-opacity duration-300 ${
-                        loadedSrcs.has(images[activeIndex ?? 0]) ? 'opacity-100' : 'opacity-0'
-                      }`}
-                      draggable={false}
-                    />
-                  </motion.div>
-                </AnimatePresence>
 
-                {images.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={showNext}
-                    aria-label="Foto berikutnya"
-                    className="absolute right-1 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur-md transition-colors hover:bg-black/60 sm:-right-14 sm:h-11 sm:w-11"
-                  >
-                    <ChevronRight className="size-5" />
-                  </button>
-                )}
-              </div>
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={activeIndex}
+                        className="relative aspect-square w-full"
+                        initial={{ opacity: 0, x: 24 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -24 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {!loadedSrcs.has(images[activeIndex ?? 0]) && (
+                          <Skeleton className="absolute inset-0 h-full w-full rounded-2xl" />
+                        )}
+                        <motion.img
+                          src={images[activeIndex ?? 0]}
+                          alt={`${productName} — foto ${(activeIndex ?? 0) + 1}`}
+                          drag={images.length > 1 ? "x" : false}
+                          dragConstraints={{ left: 0, right: 0 }}
+                          dragElastic={0.7}
+                          onDragEnd={handleDragEnd}
+                          onLoad={() => markSrcLoaded(images[activeIndex ?? 0])}
+                          className={`h-full w-full touch-pan-y select-none rounded-2xl object-cover transition-opacity duration-300 ${
+                            loadedSrcs.has(images[activeIndex ?? 0])
+                              ? "opacity-100"
+                              : "opacity-0"
+                          }`}
+                          draggable={false}
+                        />
+                      </motion.div>
+                    </AnimatePresence>
 
-              {images.length > 1 && (
-                <div className="mt-4 flex items-center gap-2">
-                  {images.map((_, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setActiveIndex(i)}
-                      aria-label={`Ke foto ${i + 1}`}
-                      className={`h-1.5 rounded-full transition-all ${
-                        i === activeIndex ? 'w-6 bg-white' : 'w-1.5 bg-white/40 hover:bg-white/60'
-                      }`}
-                    />
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          </motion.div>
+                    {images.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={showNext}
+                        aria-label="Foto berikutnya"
+                        className="absolute right-1 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur-md transition-colors hover:bg-black/60 sm:-right-14 sm:h-11 sm:w-11"
+                      >
+                        <ChevronRight className="size-5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {images.length > 1 && (
+                    <div className="mt-4 flex items-center gap-2">
+                      {images.map((_, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => {
+                            analytics.trackGallery(GalleryAction.JUMP, productName, i + 1);
+                            setActiveIndex(i);
+                          }}
+                          aria-label={`Ke foto ${i + 1}`}
+                          className={`h-1.5 rounded-full transition-all ${
+                            i === activeIndex
+                              ? "w-6 bg-white"
+                              : "w-1.5 bg-white/40 hover:bg-white/60"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
         )}
-      </AnimatePresence>,
-      document.body
-      )}
     </>
   );
 };

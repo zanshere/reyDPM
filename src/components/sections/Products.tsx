@@ -8,15 +8,17 @@ import StarBorder from '@/components/reactbits/StarBorder';
 import { LazyImage } from '@/components/lazy/LazyLoad';
 import { useTheme } from '@/hooks/useTheme';
 import { productsData, type Product } from '@/data/products';
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 const ProductsContent: React.FC = () => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const analytics = useAnalytics();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [loadedIds, setLoadedIds] = useState<Set<number>>(new Set());
   const [mounted, setMounted] = useState(false);
-  
+
   useEffect(() => setMounted(true), []);
 
   const markLoaded = useCallback((id: number) => {
@@ -24,10 +26,17 @@ const ProductsContent: React.FC = () => {
   }, []);
 
   const openModal = (product: Product) => {
+    analytics.trackProductModal({
+      productName: product.name,
+      productSlug: product.slug,
+      productPrice: product.price,
+    });
+
     setSelectedProduct(product);
     setModalOpen(true);
   };
 
+  // select_item cukup fire sekali saat modal dibuka — tidak perlu fire ulang saat ditutup.
   const closeModal = useCallback(() => {
     setModalOpen(false);
     setTimeout(() => setSelectedProduct(null), 300);
@@ -68,7 +77,7 @@ const ProductsContent: React.FC = () => {
             duration={1.3}
           />
           <p className="mx-auto max-w-md text-gray-500 dark:text-gray-400">
-            Empat model ikonik, masing-masing dengan karakternya sendiri. Temukan yang paling cocok
+            Lima model ikonik, masing-masing dengan karakternya sendiri. Temukan yang paling cocok
             dengan gayamu.
           </p>
         </div>
@@ -114,7 +123,7 @@ const ProductsContent: React.FC = () => {
                   </p>
                   <div className="flex items-center justify-between pt-1">
                     <span className="font-semibold text-primary dark:text-yellow-400">
-                      {product.price}
+                      {product.formattedPrice}
                     </span>
                     <span className="text-xs text-gray-400 dark:text-gray-500">Tap untuk lihat</span>
                   </div>
@@ -135,7 +144,9 @@ const ProductsContent: React.FC = () => {
             aria-hidden={!modalOpen}
             aria-label={selectedProduct ? `Pratinjau ${selectedProduct.name}` : undefined}
           >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={(e) => { e.stopPropagation();
+                closeModal();
+              }}>
             {selectedProduct && (
               <>
                 <button
@@ -171,7 +182,7 @@ const ProductsContent: React.FC = () => {
                 </div>
                 <div className="mt-4 flex items-center justify-between">
                   <span className="text-xl font-bold text-primary dark:text-yellow-400">
-                    {selectedProduct.price}
+                    {selectedProduct.formattedPrice}
                   </span>
                   <StarBorder color={accent} speed="3s" thickness={3}>
                     <a
@@ -197,7 +208,6 @@ const ProductsContent: React.FC = () => {
   );
 };
 
-/** Self-wrapped ThemeProvider — menggantikan ProductsIsland.tsx yang dihapus. */
 const Products: React.FC = () => (
   <ThemeProvider>
     <ProductsContent />
