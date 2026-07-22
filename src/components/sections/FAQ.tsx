@@ -5,6 +5,7 @@ import SplitText from '@/components/reactbits/SplitText';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { LazyReveal } from '@/components/lazy/LazyLoad';
 import { useTheme } from '@/hooks/useTheme';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 export const faqs = [
   {
@@ -31,6 +32,7 @@ export const faqs = [
 
 const FAQContent: React.FC = () => {
   const { theme } = useTheme();
+  const analytics = useAnalytics();
   const isDark = theme === 'dark';
 
   return (
@@ -59,7 +61,10 @@ const FAQContent: React.FC = () => {
               key={faq.q}
               className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-[#1a1a1a]"
             >
-              <AccordionTrigger className="w-full px-6 py-4 text-left font-medium transition-colors hover:bg-gray-50 dark:text-white dark:hover:bg-[#252525]">
+              <AccordionTrigger
+                className="w-full px-6 py-4 text-left font-medium transition-colors hover:bg-gray-50 dark:text-white dark:hover:bg-[#252525]"
+                onClick={() => analytics.trackFaqOpen(faq.q)}
+              >
                 <span className="flex-1">{faq.q}</span>
               </AccordionTrigger>
               <AccordionContent className="px-6 pb-4 leading-relaxed text-gray-600 dark:text-gray-300">
@@ -73,7 +78,6 @@ const FAQContent: React.FC = () => {
   );
 };
 
-/** Self-wrapped ThemeProvider — menggantikan FAQIsland.tsx yang dihapus. */
 const FAQ: React.FC = () => (
   <ThemeProvider>
     <FAQContent />
