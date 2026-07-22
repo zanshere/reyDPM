@@ -3,6 +3,7 @@ import { ThemeProvider } from '@/providers/ThemeProvider';
 import StaggeredMenu from '@/components/reactbits/StaggeredMenu';
 import { useTheme } from '@/hooks/useTheme';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { AnalyticsSource } from '@/lib/analytics.constant';
 import { INSTAGRAM_URL, TIKTOK_URL } from '@/data/dealer';
 import { Sun, Moon } from 'lucide-react';
 
@@ -31,7 +32,6 @@ const NavbarContent: React.FC = () => {
   ].filter((item): item is { label: string; link: string } => Boolean(item));
 
   const handleThemeToggle = () => {
-    // isDark masih merefleksikan tema SEBELUM toggle, jadi tema baru adalah kebalikannya.
     analytics.trackThemeChange(isDark ? 'light' : 'dark');
     toggleTheme();
   };
@@ -50,6 +50,7 @@ const NavbarContent: React.FC = () => {
           position="right"
           items={navItems.map((item) => ({ label: item.label, ariaLabel: item.label, link: item.link }))}
           socialItems={socialItems}
+          onSocialItemClick={(platform) => analytics.trackSocialClick(platform, AnalyticsSource.NAVBAR)}
           accentColor={isDark ? '#facc15' : '#4f46e5'}
           menuButtonColor={isDark ? '#fff' : '#1a1a1a'}
           openMenuButtonColor={isDark ? '#fff' : '#1a1a1a'}

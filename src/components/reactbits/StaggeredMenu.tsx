@@ -29,6 +29,7 @@ export interface StaggeredMenuProps {
   logoText?: React.ReactNode;
   onMenuOpen?: () => void;
   onMenuClose?: () => void;
+  onSocialItemClick?: (label: string, link: string) => void;
 }
 
 export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
@@ -49,7 +50,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   headerActions,
   logoText,
   onMenuOpen,
-  onMenuClose
+  onMenuClose,
+  onSocialItemClick
 }: StaggeredMenuProps) => {
   const [open, setOpen] = useState(false);
   const openRef = useRef(false);
@@ -533,6 +535,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                         target="_blank"
                         rel="noopener noreferrer"
                         className="sm-socials-link text-[1.2rem] font-medium text-[#111] dark:text-white no-underline relative inline-block py-[2px] transition-[color,opacity] duration-300 ease-linear"
+                        onClick={() => onSocialItemClick?.(s.label, s.link)}
                       >
                         {s.label}
                       </a>
