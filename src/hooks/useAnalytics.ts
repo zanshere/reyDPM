@@ -71,6 +71,10 @@ export function useAnalytics() {
     trackEvent(AnalyticsEvent.FAQ_OPEN, { question });
   }, []);
 
+  const trackSocialClick = useCallback((platform: string, source: string) => {
+    trackEvent(AnalyticsEvent.SOCIAL_CLICK, { platform, source });
+  }, []);
+
   /** Pageview manual — panggil ini dari hook Swup (hook: "page:view") saat transisi antar halaman. */
   const trackVirtualPageView = useCallback(
     (pagePath: string, pageTitle: string) => {
@@ -91,6 +95,7 @@ export function useAnalytics() {
     trackGallery,
     trackThemeChange,
     trackFaqOpen,
+    trackSocialClick,
     trackVirtualPageView,
   };
 }
